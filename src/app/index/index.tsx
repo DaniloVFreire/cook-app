@@ -1,7 +1,10 @@
-import { View, Text } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 import { styles } from './styles';
 import { IngredientList } from '@/components/IngredientList';
 import { useState } from 'react';
+import { Selected } from '@/components/Selected';
+import { router } from 'expo-router';
+
 export default function Index() {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -11,7 +14,20 @@ export default function Index() {
     } else {
       setSelected(state => [...selected, value]);
     }
-    console.log(selected);
+    //console.log(selected);
+  }
+  function handleClearSelected() {
+    Alert.alert(
+      'Limpar',
+      'Deseja realmente limpar todos os itens selecionados?',
+      [
+        { text: 'Não', style: 'cancel' },
+        { text: 'Sim', onPress: () => setSelected([]) }
+      ]
+    );
+  }
+  function handleSearch() {
+    router.navigate('/recipes');
   }
   return (
     <View style={styles.container}>
@@ -27,6 +43,13 @@ export default function Index() {
         onPressHandle={handleToggleSelected}
         selected={selected}
       />
+      {selected.length > 0 && (
+        <Selected
+          quantity={selected.length}
+          onClear={handleClearSelected}
+          onSearch={handleSearch}
+        />
+      )}
     </View>
   );
 }
