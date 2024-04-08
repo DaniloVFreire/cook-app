@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { View, Text, Alert } from 'react-native';
 import { styles } from './styles';
 import { IngredientList } from '@/components/IngredientList';
@@ -5,8 +6,13 @@ import { useState } from 'react';
 import { Selected } from '@/components/Selected';
 import { router } from 'expo-router';
 
+import { services } from '@/services';
+
 export default function Index() {
   const [selected, setSelected] = useState<string[]>([]);
+  const [ingredients, setIngredients] = useState<IngredientResponse[] | null>(
+    []
+  );
 
   function handleToggleSelected(value: string) {
     if (selected.includes(value)) {
@@ -27,8 +33,11 @@ export default function Index() {
     );
   }
   function handleSearch() {
-    router.navigate('/recipes');
+    router.navigate('/recipes/' + selected.join(','));
   }
+  useEffect(() => {
+    services.ingredients.findAll().then(setIngredients);
+  }, []);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
@@ -42,6 +51,7 @@ export default function Index() {
       <IngredientList
         onPressHandle={handleToggleSelected}
         selected={selected}
+        ingredients={ingredients ?? []}
       />
       {selected.length > 0 && (
         <Selected
